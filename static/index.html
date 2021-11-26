@@ -36,13 +36,18 @@ var H = canvas.height = window.innerHeight-50;
 var wscounter = 0;
 var socket;
 
+const id = "L" + Math.floor(999999999*Math.random());
+debug(id);
+
 function debug(str) {
+    console.log(str)
     var debugDiv = document.getElementById('debug');
     debugDiv.innerHTML = "" + str;
 }
 debug("Test");
 
 world = {};
+queue = {};
 
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
@@ -123,12 +128,16 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
+    queue[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
 }
 var counter = 0;
 function addEntityWithoutName(data) {
-    var name = "X"+(counter++)%100;
+    var entity_num = (counter++)%360;
+    var name = `${id}${entity_num}`;
+    data.colour = `hsl(${entity_num}, 100%, 50%)`;
+    data.radius = 4;
     addEntity(name,data);
 }
 
@@ -245,14 +254,16 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 
 function update() {
+    sendData();
     drawFrame();
 }
-
 
 function wsSetup() {
     var url = "ws://"+host+"/subscribe";   
     socket = new WebSocket(url);
+    console.log(socket)
     socket.onopen = function() {
+        debug("Opened Socket")
         //XXX: TODO What are you going to do here?
     };
     socket.onerror = function(msg) {
@@ -261,11 +272,23 @@ function wsSetup() {
     socket.onmessage = function(msg) {  
         try {
             debug("WebSocket Recv:" + msg.data);
-            //XXX: TODO What are you going to do here?            
+            let message = JSON.parse(msg.data);
+            for (entity in message.data) {
+                data = message.data[entity]
+                world[entity] = data
+            }
+            drawNextFrame();
         } catch (e) {
             alert("socket on message: " + e);
         }
     }; 
+}
+
+function sendData() {
+    if (Object.keys(queue).length >> 0){
+        socket.send( JSON.stringify( {"data": queue}));
+        queue = {};
+    }
 }
 
 wsSetup();
