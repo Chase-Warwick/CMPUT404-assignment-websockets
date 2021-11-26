@@ -36,13 +36,17 @@ var H = canvas.height = window.innerHeight-50;
 var wscounter = 0;
 var socket;
 
+const debugging = false
 const id = "L" + Math.floor(999999999*Math.random());
 debug(id);
 
 function debug(str) {
-    console.log(str)
-    var debugDiv = document.getElementById('debug');
-    debugDiv.innerHTML = "" + str;
+    if (debugging === true) {
+        console.log(str)
+        var debugDiv = document.getElementById('debug');
+        debugDiv.innerHTML = "" + str;
+    }
+    
 }
 debug("Test");
 
