@@ -1,5 +1,5 @@
 Click
-Flask
+Flask == 1.1.2
 Flask-Sockets
 gevent
 gevent-websocket
@@ -8,5 +8,5 @@ gunicorn
 itsdangerous
 Jinja2
 MarkupSafe
-Werkzeug
+Werkzeug == 1.0.1
 ws4py
